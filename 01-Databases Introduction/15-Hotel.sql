@@ -1,6 +1,6 @@
 CREATE DATABASE Hotel
 
---•	Employees (Id, FirstName, LastName, Title, Notes)
+--Employees (Id, FirstName, LastName, Title, Notes)
 CREATE TABLE Employees (
 	Id INT PRIMARY KEY IDENTITY,
 	FirstName NVARCHAR(30) NOT NULL,
@@ -15,7 +15,7 @@ VALUES
 	('Ivan', 'Ivanov', 'Manager', 'asdasdasd'),
 	('Pesho', 'Petrov', 'Valey', 'asdasdasd')
 
---•	Customers (AccountNumber, FirstName, LastName, PhoneNumber, EmergencyName, 
+--	Customers (AccountNumber, FirstName, LastName, PhoneNumber, EmergencyName, 
 --EmergencyNumber, Notes)
 CREATE TABLE Customers (
 	AccountNumber BIGINT PRIMARY KEY, 
@@ -34,7 +34,7 @@ VALUES
 	(12345679, 'Ivan', 'Ivanov', '0001258662', 'Goshko Ivanov', '04407070880', 'asdasd'),
 	(12345680, 'Ivan', 'Ivanov', '0001258662', 'Goshko Ivanov', '04407070880', 'asdasd')
 
---•	RoomStatus (RoomStatus, Notes)
+--RoomStatus (RoomStatus, Notes)
 CREATE TABLE RoomStatus (
 	RoomStatus NVARCHAR(10) PRIMARY KEY,
 	Notes NVARCHAR(MAX)
@@ -46,7 +46,7 @@ VALUES
 	('sakd', 'alskdj')
 
 
---•	RoomTypes (RoomType, Notes)
+--	RoomTypes (RoomType, Notes)
 CREATE TABLE RoomTypes (
 	RoomType NVARCHAR(30) PRIMARY KEY,
 	Notes NVARCHAR(MAX)
@@ -58,7 +58,7 @@ VALUES
 	('appartment', 'askd'),
 	('for one', 'alskdj')
 
--- •	BedTypes (BedType, Notes)
+-- BedTypes (BedType, Notes)
 CREATE TABLE BedTypes (
 	BedType NVARCHAR(30) PRIMARY KEY,
 	Notes NVARCHAR(MAX)
@@ -70,7 +70,7 @@ VALUES
 	('one', 'alksjd'),
 	('two', 'alksjd')
 
---•	Rooms (RoomNumber, RoomType, BedType, Rate, RoomStatus, Notes)
+--Rooms (RoomNumber, RoomType, BedType, Rate, RoomStatus, Notes)
 CREATE TABLE Rooms (
 	RoomNumber INT PRIMARY KEY, 
 	RoomType NVARCHAR(30) NOT NULL, 
@@ -86,7 +86,7 @@ VALUES
 	(11, 'for one', 'for one', 5, 'free', 'asdjka'),
 	(12, 'for one', 'for one', 5, 'free', 'asdjka')
 
---•	Payments (Id, EmployeeId, PaymentDate, AccountNumber, FirstDateOccupied, 
+--Payments (Id, EmployeeId, PaymentDate, AccountNumber, FirstDateOccupied, 
 --LastDateOccupied, TotalDays, AmountCharged, TaxRate, TaxAmount, PaymentTotal, Notes)
 CREATE TABLE Payments (
 	Id BIGINT PRIMARY KEY IDENTITY, 
@@ -110,7 +110,7 @@ VALUES
 	(1, '10-10-2022', 123456, '10-10-2022', '10-12-2022', 10, 10, 2, 'aslk'),
 	(1, '10-10-2022', 123456, '10-10-2022', '10-12-2022', 10, 10, 2, 'aslk')
 
---•	Occupancies (Id, EmployeeId, DateOccupied, AccountNumber, 
+--	Occupancies (Id, EmployeeId, DateOccupied, AccountNumber, 
 --RoomNumber, RateApplied, PhoneCharge, Notes)
 CREATE TABLE Occupancies (
 	Id INT PRIMARY KEY IDENTITY, 
