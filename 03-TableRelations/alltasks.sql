@@ -176,3 +176,8 @@ CREATE TABLE Payments (
 	PaymentAmount DECIMAL(5,2) NOT NULL,
 	StudentID INT FOREIGN KEY REFERENCES Students(StudentID) NOT NULL
 )
+
+SELECT MountainRange, PeakName, Elevation FROM Peaks JOIN Mountains
+ON Peaks.MountainId = Mountains.Id
+WHERE MountainRange = 'Rila'
+ORDER BY Elevation DESC
