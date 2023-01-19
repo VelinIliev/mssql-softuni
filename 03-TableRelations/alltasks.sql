@@ -2,21 +2,21 @@
 CREATE DATABASE People
 
 CREATE TABLE Passports (
-    PassportID INT PRIMARY KEY,
-    PassportNumber VARCHAR(20)
+    PassportID INT PRIMARY KEY IDENTITY(101, 1),
+    PassportNumber VARCHAR(20) UNIQUE NOT NULL
 )
 
-INSERT INTO Passports (PassportID, PassportNumber)
+INSERT INTO Passports (PassportNumber)
 VALUES 
-	(101, 'N34FG21B'),
-	(102, 'K65LO4R7'),
-	(103, 'ZE657QP2')
+	('N34FG21B'),
+	('K65LO4R7'),
+	('ZE657QP2')
 
 CREATE TABLE Persons(
 	PersonID INT PRIMARY KEY IDENTITY,
 	FirstName NVARCHAR(30) NOT NULL,
-	Salary DECIMAL(10, 2),
-	PassportID INT FOREIGN KEY REFERENCES  Passports(PassportID)
+	Salary DECIMAL(10, 2) NOT NULL,
+	PassportID INT FOREIGN KEY REFERENCES Passports(PassportID)		UNIQUE NOT NULL
 	)
 
 INSERT INTO Persons(FirstName, Salary, PassportID)
@@ -30,7 +30,7 @@ VALUES
 CREATE TABLE Manufacturers (
 	ManufacturerID INT PRIMARY KEY IDENTITY,
 	[Name] NVARCHAR(20) NOT NULL,
-	EstablishedOn DATETIME2
+	EstablishedOn DATETIME2 NOT NULL
 )
 INSERT INTO Manufacturers([Name], EstablishedOn)
 VALUES
@@ -39,19 +39,19 @@ VALUES
 	('Lada', '01/05/1966')
 
 CREATE TABLE Models (
-	ModelID INT PRIMARY KEY,
+	ModelID INT PRIMARY KEY IDENTITY(101, 1),
 	[Name] NVARCHAR(30) NOT NULL,
-	ManufacturerID INT FOREIGN KEY REFERENCES Manufacturers(ManufacturerID)
+	ManufacturerID INT FOREIGN KEY REFERENCES Manufacturers(ManufacturerID) NOT NULL
 	)
 
-INSERT INTO Models (ModelID, [Name], ManufacturerID)
+INSERT INTO Models ([Name], ManufacturerID)
 VALUES
-	(101, 'X1', 1),
-	(102, 'i6', 1),
-	(103, 'Model S', 2),
-	(104, 'Model X', 2),
-	(105, 'Model 3', 2),
-	(106, 'Nova', 3)
+	('X1', 1),
+	('i6', 1),
+	('Model S', 2),
+	('Model X', 2),
+	('Model 3', 2),
+	('Nova', 3)
 
 --3 Many-To-Many Relationship
 CREATE TABLE Students (
@@ -63,24 +63,21 @@ INSERT INTO Students([Name])
 VALUES ('Mila'), ('Toni'), ('Ron')
 
 CREATE TABLE Exams (
-	ExamID INT PRIMARY KEY,
+	ExamID INT PRIMARY KEY IDENTITY(101,1),
 	[Name] NVARCHAR(30) NOT NULL
 	)
 
-INSERT INTO Exams (ExamID, [Name])
+INSERT INTO Exams ([Name])
 VALUES 
-	(101, 'SpringMVC'),
-	(102, 'Neo4j'),
-	(103, 'Oracle 11g')
+	('SpringMVC'),
+	('Neo4j'),
+	('Oracle 11g')
 
 CREATE TABLE StudentsExams (
 	StudentID INT FOREIGN KEY REFERENCES Students(StudentID) NOT NULL,
-	ExamID INT FOREIGN KEY REFERENCES Exams(ExamID) NOT NULL
+	ExamID INT FOREIGN KEY REFERENCES Exams(ExamID) NOT NULL,
+	PRIMARY KEY(StudentID, ExamID)
 	)
-
-ALTER TABLE StudentsExams
-ADD CONSTRAINT PK_StudentsExams
-PRIMARY KEY (StudentID, ExamID)
 
 INSERT INTO StudentsExams (StudentID, ExamID)
 VALUES 
@@ -93,19 +90,19 @@ VALUES
 
 --4 Self-Referencing
 CREATE TABLE Teachers (
-	TeacherID INT PRIMARY KEY,
+	TeacherID INT PRIMARY KEY IDENTITY(101,1),
 	[Name] NVARCHAR(30) NOT NULL,
 	ManagerID INT FOREIGN KEY REFERENCES Teachers(TeacherID)
 	)
 
-INSERT INTO Teachers (TeacherID, [Name], ManagerID)
+INSERT INTO Teachers ([Name], ManagerID)
 VALUES
-	(101, 'John', NULL),
-	(102, 'Maya', 106),
-	(103, 'Silvia', 106),
-	(104, 'Ted', 105),
-	(105, 'Mark', 101),
-	(106, 'Greta', 101)
+	('John', NULL),
+	('Maya', 106),
+	('Silvia', 106),
+	('Ted', 105),
+	('Mark', 101),
+	(	'Greta', 101)
 
 --5 Online Store Database
 
@@ -153,9 +150,9 @@ CREATE TABLE Majors (
 
 CREATE TABLE Students(
 	StudentID INT PRIMARY KEY IDENTITY,
-	StudentNumber INT NOT NULL,
+	StudentNumber VARCHAR(20) UNIQUE NOT NULL,
 	StudentName VARCHAR(50) NOT NULL,
-	MajorID INT FOREIGN KEY REFERENCES Majors(MajorID)
+	MajorID INT FOREIGN KEY REFERENCES Majors(MajorID) NOT NULL
 	)
 
 CREATE TABLE Subjects (
@@ -166,18 +163,22 @@ CREATE TABLE Subjects (
 CREATE TABLE Agenda (
 	StudentID INT FOREIGN KEY REFERENCES Students(StudentID),
 	SubjectID INT FOREIGN KEY REFERENCES Subjects(SubjectID) NOT NULL,
-	CONSTRAINT PK_Agenda
 	PRIMARY KEY (StudentID, SubjectID)
 	)
 
 CREATE TABLE Payments (
 	PaymentID INT PRIMARY KEY IDENTITY,
 	PaymentDate DATETIME2 NOT NULL,
-	PaymentAmount DECIMAL(5,2) NOT NULL,
+	PaymentAmount DECIMAL(6,2) NOT NULL,
 	StudentID INT FOREIGN KEY REFERENCES Students(StudentID) NOT NULL
 )
 
-SELECT MountainRange, PeakName, Elevation FROM Peaks JOIN Mountains
-ON Peaks.MountainId = Mountains.Id
-WHERE MountainRange = 'Rila'
-ORDER BY Elevation DESC
+-- 9
+USE Geography
+
+SELECT m.MountainRange, p.PeakName, p.Elevation FROM Peaks AS [p] 
+LEFT JOIN Mountains AS [m]
+ON [p].[MountainId] = m.id
+WHERE m.MountainRange = 'Rila'
+ORDER BY p.Elevation DESC
+
