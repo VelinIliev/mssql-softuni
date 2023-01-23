@@ -126,6 +126,13 @@ WHERE c.ContinentCode = 'AF'
 ORDER BY c.CountryName
 
 --15. Continents and Currencies
+
+
+--16. Countries Without any Mountains
+SELECT COUNT(*) AS [Count]  FROM Countries AS c
+LEFT JOIN MountainsCountries as m
+ON c.CountryCode = m.CountryCode
+WHERE m.MountainId IS NULL
+
+--17. Highest Peak and Longest River by Country
 SELECT * FROM Countries
-SELECT * FROM Continents
-SELECT * FROM Currencies

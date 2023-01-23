@@ -26,18 +26,17 @@ WHERE JobTitle NOT LIKE '%engineer%'
 --05. Find Towns with Name Length
 
 SELECT [Name] FROM Towns
-WHERE LEN([Name]) = 5 OR LEN([Name]) = 6
+WHERE LEN([Name]) IN (5,6)
 ORDER BY [Name]
 
 --06. Find Towns Starting With
 
 SELECT TownId, [Name] FROM Towns
-WHERE LEFT([Name], 1) = 'M' OR LEFT([Name], 1) = 'K'
-OR LEFT([Name], 1) = 'B' OR LEFT([Name], 1) = 'E'
+WHERE LEFT([Name], 1) IN ('M', 'K', 'B', 'E')
 ORDER BY [Name]
 
 --07. Find Towns Not Starting With
-
+	
 SELECT TownId, [Name] FROM Towns
 WHERE LEFT([Name], 1) != 'R' 
 	AND LEFT([Name], 1) != 'B' 
@@ -70,31 +69,34 @@ ORDER BY Salary DESC
 
 --11. Find All Employees with Rank 2
 SELECT * FROM (
-SELECT EmployeeID, FirstName, LastName, Salary, DENSE_RANK() OVER (
-	PARTITION BY Salary
-	ORDER BY EmployeeID
-	) AS [Rank]
-FROM Employees
-WHERE Salary >= 10000 AND Salary <= 50000
-) v
+	SELECT EmployeeID, FirstName, LastName, Salary, DENSE_RANK() OVER (
+		PARTITION BY Salary
+		ORDER BY EmployeeID
+		) AS [Rank]
+	FROM Employees
+	WHERE Salary >= 10000 AND Salary <= 50000
+	) AS v
 WHERE [Rank] = 2
 ORDER BY Salary DESC
 
 USE Geography
 
 --12. Countries Holding 'A' 3 or More Times
-
+--Method 1
 SELECT CountryName, IsoCode FROM Countries
-WHERE LEN(CountryName) - LEN(REPLACE(CountryName, 'a', '')) >= 3
+WHERE LEN(CountryName) - LEN(REPLACE(LOWER(CountryName), 'a', '')) >= 3
+ORDER BY IsoCode
+--Method 2
+SELECT CountryName, IsoCode FROM Countries
+WHERE LOWER(CountryName) LIKE '%a%a%a%'
 ORDER BY IsoCode
 
 --13. Mix of Peak and River Names
 
 SELECT PeakName, RiverName, 
-	CONCAT(SUBSTRING(LOWER(PeakName), 1, LEN(PeakName) - 1), 
-			LOWER(RiverName)) AS Mix 
+	LOWER(CONCAT(SUBSTRING(PeakName, 1, LEN(PeakName) - 1), RiverName)) AS Mix 
 	FROM Peaks, Rivers
-WHERE RIGHT(PeakName, 1) = LEFT(RiverName, 1) 
+WHERE RIGHT(LOWER(PeakName), 1) = LEFT(LOWER(RiverName), 1) 
 ORDER BY Mix
 
 --14. Games From 2011 and 2012 Year
@@ -120,18 +122,18 @@ ORDER BY Username
 --17. Show All Games with Duration & Part of the Day
 SELECT [Name], 
 	CASE 
-	WHEN DATEPART(HOUR, [Start]) >= 0 AND DATEPART(HOUR, [Start]) < 12 THEN 'Morning'
-	WHEN DATEPART(HOUR, [Start])  >= 12 AND DATEPART(HOUR, [Start])  < 18 THEN 'Afternoon'
-	WHEN DATEPART(HOUR, [Start])  >= 18 AND DATEPART(HOUR, [Start])  < 24 THEN 'Evening'
+		WHEN DATEPART(HOUR, [Start]) >= 0 AND DATEPART(HOUR, [Start]) < 12 THEN 'Morning'
+		WHEN DATEPART(HOUR, [Start])  >= 12 AND DATEPART(HOUR, [Start])  < 18 THEN 'Afternoon'
+		WHEN DATEPART(HOUR, [Start])  >= 18 AND DATEPART(HOUR, [Start])  < 24 THEN 'Evening'
 	END AS [Part of the Day],
 	CASE 
-	WHEN Duration <= 3 THEN 'Extra Short'
-	WHEN Duration >=4 AND Duration <= 6 THEN 'Short'
-	WHEN Duration >= 6 THEN 'Long'
-	WHEN Duration IS NULL THEN 'Extra Long'
+		WHEN Duration <= 3 THEN 'Extra Short'
+		WHEN Duration >=4 AND Duration <= 6 THEN 'Short'
+		WHEN Duration >= 6 THEN 'Long'
+		WHEN Duration IS NULL THEN 'Extra Long'
 	END AS Duration
 	FROM Games
-	
+	AS g
 ORDER BY [Name], Duration, [Part of the Day]
 
 --18. Orders Table
