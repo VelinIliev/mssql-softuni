@@ -126,6 +126,27 @@ WHERE c.ContinentCode = 'AF'
 ORDER BY c.CountryName
 
 --15. Continents and Currencies
+--Create a query that selects:
+	--ContinentCode
+	--CurrencyCode
+	--CurrencyUsage
+--Find all continents and their most used currency. 
+--Filter any currency, which is used in only one country. Sort your results by ContinentCode.
+SELECT
+	r.ContinentCode, 
+	r.CurrencyCode, 
+	r.CurrencyUsage
+FROM
+	(SELECT 
+		c.ContinentCode, 
+		c.CurrencyCode, 
+		COUNT(*) AS CurrencyUsage,
+		DENSE_RANK() OVER (PARTITION BY c.ContinentCode ORDER BY COUNT(*) DESC) AS Ranked
+	FROM Countries as c
+	GROUP BY c.ContinentCode, c.CurrencyCode) AS r
+WHERE r.Ranked = 1 AND r.CurrencyUsage != 1
+ORDER BY r.ContinentCode, r.CurrencyCode
+
 
 
 --16. Countries Without any Mountains
@@ -135,4 +156,44 @@ ON c.CountryCode = m.CountryCode
 WHERE m.MountainId IS NULL
 
 --17. Highest Peak and Longest River by Country
-SELECT * FROM Countries
+SELECT TOP(5)
+	c.CountryName, 
+	MAX(p.Elevation) AS HighestPeakElevation, 
+	MAX(r.Length) AS LongestRiverLength
+	FROM Countries AS c
+JOIN CountriesRivers AS cr
+ON c.CountryCode = cr.CountryCode
+JOIN Rivers AS r
+ON cr.RiverId = r.Id
+JOIN MountainsCountries AS mc
+ON c.CountryCode = mc.CountryCode
+JOIN Mountains AS m
+ON mc.MountainId = m.Id
+JOIN Peaks AS p
+ON mc.MountainId = p.MountainId
+GROUP BY c.CountryName
+ORDER BY HighestPeakElevation DESC, LongestRiverLength DESC, c.CountryName
+
+--18 Highest Peak Name and Elevation by Country
+SELECT TOP(5)
+	cmp.Country,
+	ISNULL(cmp.[Highest Peak Name], '(no highest peak)') AS [Highest Peak Name],
+	ISNULL(cmp.[Highest Peak Elevation], 0) AS [Highest Peak Elevation],
+	ISNULL(cmp.Mountain, '(no mountain)') AS Mountain
+FROM
+	(	SELECT 
+			c.CountryName AS Country, 
+			p.PeakName AS [Highest Peak Name], 
+			p.Elevation AS [Highest Peak Elevation], 
+			m.MountainRange AS Mountain,
+			DENSE_RANK() OVER (PARTITION BY c.CountryName ORDER BY p.Elevation DESC) AS Ranked
+			FROM Countries as c
+			LEFT JOIN MountainsCountries as mc
+			ON c.CountryCode = mc.CountryCode
+			LEFT JOIN Mountains as m
+			ON mc.MountainId = m.Id
+			LEFT JOIN Peaks as p 
+			ON m.Id = p.MountainId
+		) AS cmp
+WHERE cmp.Ranked = 1
+ORDER BY cmp.Country, cmp.[Highest Peak Name]
