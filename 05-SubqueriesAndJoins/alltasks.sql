@@ -4,7 +4,7 @@ USE SoftUni
 SELECT TOP(5) e.EmployeeID, e.JobTitle, e.AddressID, a.AddressText FROM Employees AS e
 LEFT JOIN Addresses as a
 ON e.AddressID = a.AddressID
-ORDER BY AddressID 
+ORDER BY e.AddressID 
 
 --02. Addresses with Towns
 SELECT TOP(50) e.FirstName, e.LastName, t.[Name], a.AddressText FROM Employees AS e
@@ -48,11 +48,11 @@ ORDER BY e.HireDate
 
 --07. Employees With Project
 SELECT TOP(5) e.EmployeeID, e.FirstName, p.[Name] FROM Employees AS e
-LEFT JOIN EmployeesProjects AS ep
+JOIN EmployeesProjects AS ep
 ON e.EmployeeID = ep.EmployeeID
-LEFT JOIN Projects AS p
+JOIN Projects AS p
 ON ep.ProjectID = p.ProjectID
-WHERE ep.ProjectID IS NOT NULL AND p.StartDate > '08-13-2002'
+WHERE p.StartDate > '08-13-2002' AND p.EndDate IS NULL
 ORDER BY e.EmployeeID
 
 --08. Employee 24
@@ -72,7 +72,7 @@ WHERE e.EmployeeID = 24
  SELECT e.EmployeeID, e.FirstName, e.ManagerID, m.FirstName AS ManagerName FROM Employees as e
  JOIN Employees AS m
  ON m.EmployeeID = e.ManagerID
- WHERE e.ManagerID = 3 OR e.ManagerID = 7
+ WHERE e.ManagerID IN (3, 7)
  ORDER BY e.EmployeeID
 
  --10. Employees Summary
@@ -113,7 +113,10 @@ ORDER BY Elevation DESC
 SELECT mc.CountryCode, 
 		COUNT(mc.CountryCode) AS MountainRanges 
 		FROM MountainsCountries AS mc
-WHERE mc.CountryCode = 'BG' OR mc.CountryCode = 'RU' or mc.CountryCode = 'US'
+WHERE mc.CountryCode IN (
+							SELECT CountryCode FROM Countries 
+							WHERE CountryName IN ('Bulgaria', 'Russia', 'United States')
+							)
 GROUP BY mc.CountryCode
 
 --14. Countries With or Without Rivers
@@ -137,13 +140,15 @@ SELECT
 	r.CurrencyCode, 
 	r.CurrencyUsage
 FROM
-	(SELECT 
-		c.ContinentCode, 
-		c.CurrencyCode, 
-		COUNT(*) AS CurrencyUsage,
-		DENSE_RANK() OVER (PARTITION BY c.ContinentCode ORDER BY COUNT(*) DESC) AS Ranked
-	FROM Countries as c
-	GROUP BY c.ContinentCode, c.CurrencyCode) AS r
+	(
+		SELECT 
+			c.ContinentCode, 
+			c.CurrencyCode, 
+			COUNT(*) AS CurrencyUsage,
+			DENSE_RANK() OVER (PARTITION BY c.ContinentCode ORDER BY COUNT(*) DESC) AS Ranked
+		FROM Countries as c
+		GROUP BY c.ContinentCode, c.CurrencyCode
+	) AS r
 WHERE r.Ranked = 1 AND r.CurrencyUsage != 1
 ORDER BY r.ContinentCode, r.CurrencyCode
 
