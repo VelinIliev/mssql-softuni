@@ -103,7 +103,32 @@ END
 GO
 
 --08. *Delete Employees and Departments
+CREATE OR ALTER PROC usp_DeleteEmployeesFromDepartment (@departmentId INT)
+AS
+BEGIN
+	DELETE FROM EmployeesProjects
+	WHERE EmployeeID IN (SELECT EmployeeID FROM Employees WHERE DepartmentID = @departmentId)
 
+	UPDATE Employees 
+	SET ManagerID = NULL
+	WHERE ManagerID IN (SELECT e.EmployeeID  FROM Employees AS e WHERE e.DepartmentID = @departmentId)
+
+	ALTER TABLE Departments
+	ALTER COLUMN ManagerId INT
+
+	UPDATE Departments
+	SET ManagerID = NULL
+	WHERE ManagerID IN (SELECT e.EmployeeID FROM Employees AS e WHERE DepartmentID = @departmentId)
+
+	DELETE FROM Employees
+	WHERE DepartmentID = @departmentId
+
+	DELETE FROM Departments 
+	WHERE DepartmentID = @departmentId
+
+	SELECT COUNT(EmployeeID) FROM Employees
+	WHERE DepartmentID = @departmentId
+END
 
 --09. Find Full Name
 USE Bank
@@ -173,4 +198,7 @@ EXEC usp_CalculateFutureValueForAccount 1, 0.1
 GO
 
 --13. *Cash in User Games Odd Rows
+
+USE Diablo
+
 
