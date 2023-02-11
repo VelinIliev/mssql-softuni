@@ -30,7 +30,7 @@ CREATE TABLE Sites (
 CREATE TABLE Tourists (
 	Id INT PRIMARY KEY IDENTITY,
 	[Name] VARCHAR(50) NOT NULL,
-	Age INT CHECK(Age BETWEEN 0 AND 120) NOT NULL,
+	Age INT NOT NULL CHECK(Age BETWEEN 0 AND 120),
 	PhoneNumber VARCHAR(20) NOT NULL,
 	Nationality VARCHAR(30) NOT NULL,
 	Reward VARCHAR(20)
@@ -105,7 +105,7 @@ ON s.CategoryId = c.Id
 ORDER BY Category DESC, [Location], Site
 
 --07. Count of Sites in Sofia Province
-SELECT l.Municipality AS Provence,
+SELECT l.Province,
 	l.Municipality,
 	l.[Name] AS [Location],
 	COUNT(l.[Name]) AS CountOfSites
@@ -113,11 +113,11 @@ FROM Sites AS s
 JOIN Locations AS l
 ON s.LocationId = l.Id
 WHERE l.Province = 'Sofia'
-GROUP BY l.Municipality, l.Municipality, l.[Name]
+GROUP BY l.Province, l.Municipality, l.[Name]
 ORDER BY COUNT(l.[Name]) DESC, l.[Name]
 
 --08. Tourist Sites established BC
-SELECT * FROM Sites AS s
+SELECT s.[Name] AS Site, l.[Name] AS [Location], l.Municipality, l.Province, s.Establishment  FROM Sites AS s
 JOIN Locations AS l
 ON s.LocationId = l.Id
 WHERE SUBSTRING(l.[Name], 1, 1) NOT IN ('B', 'M', 'D') 
